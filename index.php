@@ -1,41 +1,7 @@
 <?php
 include 'DB_Ops.php';
-
-class User
-{
-    public $full_name;
-    public $user_name;
-    public $phone;
-    public $whatsapp_number;
-    public $address;
-    public $email;
-    private $password;
-    public $user_image;
-    public $image_path;
-
-
-    public function __construct($full_name, $user_name, $phone, $whatsapp_number, $address, $email, $password, $user_image)
-    {
-        $this->full_name = $full_name;
-        $this->user_name = $user_name;
-        $this->phone = $phone;
-        $this->whatsapp_number = $whatsapp_number;
-        $this->address = $address;
-        $this->email = $email;
-        $this->password = $password;
-        $this->user_image = $user_image;
-    }
-}
-
-
-class UserDataHandler
-{
-
-}
-
-
-
-
+include_once('User.php');
+include('photoHandler.php');
 
 
 function clean_input($data)
@@ -45,6 +11,8 @@ function clean_input($data)
     $data = htmlspecialchars($data);
     return $data;
 }
+
+$photoHandler = new PhotoHandler();
 
 
 $fullName =
@@ -56,6 +24,7 @@ $fullName =
     $password =
     $confirmPassword =
     $user_image = "";
+
 
 $fullNameError = $userNameError = $phoneError = $whatsappNumberError = $addressError = $emailError = $passwordError
     = $confirmPasswordError = $userImageError = "";
@@ -73,6 +42,11 @@ function validate_fullForm()
     $user_image,
     $fullNameError, $userNameError, $phoneError, $whatsappNumberError, $addressError, $emailError,
     $passwordError, $confirmPasswordError, $userImageError;
+
+
+
+
+
 
 
 
@@ -149,31 +123,71 @@ function validate_fullForm()
 
 
 
-        if (empty($_POST['confirm_password']))
+        if (empty($_POST['confirm_password'])) {
             $confirmPasswordError = "Confirm Password is required";
-        else {
+        } else {
             $confirmPassword = clean_input($_POST['confirm_password']);
             if ($password != $confirmPassword) {
                 $confirmPasswordError = "passwords do not match";
             }
+        }
 
 
-            if (empty($_FILES['user_image']['name']))
-                $userImageError = "User image is required";
-            else
-                $user_image = $_FILES['user_image'];
+        if (empty($_FILES['user_image']['name']))
+            $userImageError = "User image is required";
+        else {
+            $user_image = $_FILES['user_image'];
+            global $photoHandler;
+            $targetPath = $photoHandler->extractSavedPhotoPath();
+
+        }
+
+
+
+
+
+        if (
+            empty($fullNameError) && empty($userNameError) && empty($phoneError) && empty($whatsappNumberError) && empty($addressError) &&
+            empty($emailError) && empty($passwordError) && empty($confirmPasswordError) && empty($userImageError) && (!empty($targetPath) && $targetPath != null)
+        ) {
+            $newUser = new User(
+                $fullName,
+                $userName,
+                $phone,
+                $whatsappNumber,
+                $address,
+                $email,
+                $password,
+                $targetPath
+            );
+
+            echo "<pre>";
+            print_r($newUser);  // Debug: Print the object before DB insert
+            echo "</pre>";
+            if (addUserToDb($newUser)) {
+                echo "Successfully";
+            } else {
+                echo "failed";
+            }
+            ;
+            //header("Location: success.php"); 
+            exit();
+
+        } else {
+            echo (
+                "<script>
+                        alert('failed to add user');
+                    </script>"
+            );
         }
     }
-
-    // if (empty($fullNameError) && empty($userNameError) && empty($phoneError) && empty($whatsappNumberError) && empty($addressError) &&
-    // empty($emailError) && empty($passwordError) && empty($confirmPasswordError) && empty($userImageError)) {
-    //     header("Location: success.php"); 
-    //     exit();
-    // }
 }
 
 
-validate_fullForm();
+
+
+if (isset($_POST["submit"]))
+    validate_fullForm();
 
 
 
@@ -210,12 +224,14 @@ validate_fullForm();
 
         <br><br>
         <label for="phone">Phone</label>
-        <input type="text" name="phone" id="phone" placeholder="01********" value="<?php echo htmlspecialchars($phone) ?>">
+        <input type="text" name="phone" id="phone" placeholder="01********"
+            value="<?php echo htmlspecialchars($phone) ?>">
         <span class="error">* <?php echo $phoneError; ?></span>
 
         <br><br>
         <label for="whatsapp_number">Whatsapp Number</label>
-        <input type="text" name="whatsapp_number" id="whatsapp_number" placeholder="01********" value="<?php echo htmlspecialchars($whatsappNumber) ?>">
+        <input type="text" name="whatsapp_number" id="whatsapp_number" placeholder="01********"
+            value="<?php echo htmlspecialchars($whatsappNumber) ?>">
         <span class="error">* <?php echo $whatsappNumberError; ?></span>
 
 
@@ -249,7 +265,7 @@ validate_fullForm();
         <br><br>
 
 
-        <input type="submit" value="Register">
+        <input type="submit" value="submit" name="submit">
 
 
     </form>
