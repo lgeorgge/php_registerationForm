@@ -1,4 +1,21 @@
 <?php
+
+
+
+if (isset($_POST['check_username'])) {
+    checkUsername($_POST['check_username']);
+    exit;
+}
+
+function checkUsername($username) {
+    $conn = new mysqli("localhost", "uni_db_admins", "??@admins??", "uni_registeration_db");
+    $username = $conn->real_escape_string($username);
+    $result = $conn->query("SELECT * FROM users WHERE user_name = '$username'");
+    echo ($result->num_rows > 0) ? "taken" : "available";
+}
+
+
+
 include 'DB_Ops.php';
 include_once('User.php');
 include('photoHandler.php');
@@ -63,7 +80,6 @@ function validate_fullForm()
             }
         }
 
-        //need to add ajax
 
 
         if (empty($_POST['user_name']))
@@ -186,6 +202,15 @@ function validate_fullForm()
 
 
 
+
+
+// dataBaseName = uni_registeration_db;
+// hostName = localhost;
+
+// dataBaseUserName =>uni_db_admins
+// dataBasePassword => ??@admins??
+
+
 if (isset($_POST["submit"]))
     validate_fullForm();
 
@@ -218,8 +243,8 @@ if (isset($_POST["submit"]))
         <br>
         <br>
         <label for="user_name">User Name</label>
-        <input type="text" name="user_name" id="user_name" value="<?php echo htmlspecialchars($userName) ?>">
-        <span class="error">* <?php echo $userNameError; ?></span>
+        <input type="text" name="user_name" id="user_name" onkeyup="checkUsername()" value="<?php echo htmlspecialchars($userName) ?>">
+        <span class="error" id ="messageAJax">* <?php echo $userNameError; ?></span>
 
 
         <br><br>
@@ -272,3 +297,32 @@ if (isset($_POST["submit"]))
 </body>
 
 </html>
+
+<script>
+
+
+function checkUsername() {
+    let username = document.getElementById("user_name").value;
+    if (username.length > 0) {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "index.php", true); // same file
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                let result = xhr.responseText;
+                let msg = document.getElementById("messageAJax");
+                if (result === "taken") {
+                    msg.innerText = "Username already taken ❌";
+                    msg.style.color = "red";
+                } else {
+                    msg.innerText = "Username available ✅";
+                    msg.style.color = "green";
+                }
+            }
+        };
+        xhr.send("check_username=" + encodeURIComponent(username));
+    } else {
+        document.getElementById("messageAJax").innerText = "";
+    }
+}
+</script>
