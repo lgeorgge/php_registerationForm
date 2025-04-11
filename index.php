@@ -7,7 +7,8 @@ if (isset($_POST['check_username'])) {
     exit;
 }
 
-function checkUsername($username) {
+function checkUsername($username)
+{
     $conn = new mysqli("localhost", "uni_db_admins", "??@admins??", "uni_registeration_db");
     $username = $conn->real_escape_string($username);
     $result = $conn->query("SELECT * FROM users WHERE user_name = '$username'");
@@ -19,6 +20,7 @@ function checkUsername($username) {
 include 'DB_Ops.php';
 include_once('User.php');
 include('photoHandler.php');
+include_once('header.php');
 
 
 function clean_input($data)
@@ -231,76 +233,77 @@ if (isset($_POST["submit"]))
 </head>
 
 <body>
-    <form action="index.php" method="post" id="form1" enctype="multipart/form-data">
-        <label for="full_name">Full Name</label>
-        <input type="text" name="full_name" id="full_name" value="<?php echo htmlspecialchars($fullName) ?>">
+    <div class="form-container">
+        <form action="index.php" method="post" id="form1" enctype="multipart/form-data" class="from">
+            <label for="full_name">Full Name</label>
+            <input type="text" name="full_name" id="full_name" value="<?php echo htmlspecialchars($fullName) ?>">
 
-        <span class="error">* <?php echo $fullNameError; ?></span>
-
-
-
-
-        <br>
-        <br>
-        <label for="user_name">User Name</label>
-        <input type="text" name="user_name" id="user_name" onkeyup="checkUsername()" value="<?php echo htmlspecialchars($userName) ?>">
-        <span class="error" id ="messageAJax">* <?php echo $userNameError; ?></span>
+            <span class="error">* <?php echo $fullNameError; ?></span>
 
 
-        <br><br>
-        <label for="phone">Phone</label>
-        <input type="text" name="phone" id="phone" placeholder="01********"
-            value="<?php echo htmlspecialchars($phone) ?>">
-        <span class="error">* <?php echo $phoneError; ?></span>
-
-        <br><br>
-        <label for="whatsapp_number">Whatsapp Number</label>
-        <input type="text" name="whatsapp_number" id="whatsapp_number" placeholder="01********"
-            value="<?php echo htmlspecialchars($whatsappNumber) ?>">
-        <span class="error">* <?php echo $whatsappNumberError; ?></span>
 
 
-        <br><br>
-        <label for="address">Address</label>
-        <textarea name="address" rows="5" cols="40">
-
-        <?php echo htmlspecialchars($address) ?>
-        </textarea>
-        <span class="error">* <?php echo $addressError; ?></span>
-
-        <br><br>
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($email) ?>">
-        <span class="error">* <?php echo $emailError; ?></span>
-
-        <br><br>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-        <span class="error">* <?php echo $passwordError; ?></span>
-
-        <br><br>
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" name="confirm_password" id="confirm_password">
-        <span class="error">* <?php echo $confirmPasswordError; ?></span>
-        <br><br>
-
-        <label for="user_image">User Image</label>
-        <input type="file" name="user_image" id="user_image">
-        <span class="error">* <?php echo $userImageError; ?></span>
-        <br><br>
+            <br>
+            <br>
+            <label for="user_name">User Name</label>
+            <input type="text" name="user_name" id="user_name" onkeyup="checkUsername()"
+                value="<?php echo htmlspecialchars($userName) ?>">
+            <span class="error" id="messageAJax">* <?php echo $userNameError; ?></span>
 
 
-        <input type="submit" value="submit" name="submit">
+            <br><br>
+            <label for="phone">Phone</label>
+            <input type="text" name="phone" id="phone" placeholder="01********"
+                value="<?php echo htmlspecialchars($phone) ?>">
+            <span class="error">* <?php echo $phoneError; ?></span>
+
+            <br><br>
+            <label for="whatsapp_number">Whatsapp Number</label>
+            <input type="text" name="whatsapp_number" id="whatsapp_number" placeholder="01********"
+                value="<?php echo htmlspecialchars($whatsappNumber) ?>">
+            <span class="error">* <?php echo $whatsappNumberError; ?></span>
 
 
-    </form>
+            <br><br>
+            <label for="address">Address</label>
+            <textarea name="address" rows="2" cols="40">
+
+            <?php echo htmlspecialchars($address) ?>
+            </textarea>
+            <span class="error">* <?php echo $addressError; ?></span>
+
+            <br><br>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($email) ?>">
+            <span class="error">* <?php echo $emailError; ?></span>
+
+            <br><br>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+            <span class="error">* <?php echo $passwordError; ?></span>
+
+            <br><br>
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" name="confirm_password" id="confirm_password">
+            <span class="error">* <?php echo $confirmPasswordError; ?></span>
+            <br><br>
+
+            <label for="user_image">User Image</label>
+            <input type="file" name="user_image" id="user_image">
+            <span class="error">* <?php echo $userImageError; ?></span>
+            <br><br>
+
+
+            <input type="submit" value="submit" name="submit" id="button">
+
+
+        </form>
+    </div>
 </body>
 
 </html>
 
 <script>
-
-
 function checkUsername() {
     let username = document.getElementById("user_name").value;
     if (username.length > 0) {
@@ -317,6 +320,7 @@ function checkUsername() {
                 } else {
                     msg.innerText = "Username available ✅";
                     msg.style.color = "green";
+                    
                 }
             }
         };
