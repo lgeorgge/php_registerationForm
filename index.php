@@ -18,6 +18,7 @@ function checkUsername($username)
 
 
 include 'DB_Ops.php';
+include 'API_Ops.php';
 include_once('User.php');
 include('photoHandler.php');
 include_once('header.php');
@@ -109,9 +110,9 @@ function validate_fullForm()
             if (!preg_match('/^\d{11}$/', $whatsappNumber)) {
                 $whatsappNumberError = "whatsappNumber number must be exactly 11 digits and contain only numbers.";
             }
-            /**
-             * need to add the whatsapp number validator==> server
-             */
+            else if(!validateNumber($whatsappNumber)){
+            $whatsappNumberError="WhatsApp Number isn't valid";
+          }
         }
 
         if (empty($_POST['address'])) {
